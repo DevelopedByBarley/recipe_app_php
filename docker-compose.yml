@@ -1,0 +1,42 @@
+version: '3.9'
+services:
+  recipe_app:
+    build:
+      context: "./"
+      dockerfile: "Dockerfile"
+    volumes:
+      - "./src:/var/www/html/src"
+    ports:
+      - "80:80"
+    networks:
+      - recipe_app_net
+    depends_on:
+      - recipe_database
+  recipe_database:
+    build:
+      context: './src/config/database'
+      dockerfile: Dockerfile
+    environment:
+      MYSQL_DATABASE: "recipe_app_db"
+      MYSQL_USER: "Barley"
+      MYSQL_PASSWORD: "Csak1enter"
+      MYSQL_ROOT_PASSWORD: "Csak1enter"
+    networks:
+      - recipe_app_net
+  phpmyadmin:
+    image: "phpmyadmin/phpmyadmin"
+    environment:
+      PMA_HOST: "recipe_database"
+      PMA_USER: "Barley"
+      PMA_PASSWORD: "Csak1enter"
+      PMA_PORT: "3306"
+    ports:
+      - "8181:80"
+    networks:
+      - recipe_app_net
+    depends_on:
+      - recipe_database
+
+networks:
+  recipe_app_net:
+    driver: bridge
